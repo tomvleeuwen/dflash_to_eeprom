@@ -35,7 +35,7 @@
 
 ######################################################################### 
 #                                                                       #
-#  DUCUMENTATION                                                        #
+#  DOCUMENTATION                                                        #
 #                                                                       #
 # The "FRM3" and other Electronic Control Units contain the             #
 # MC9S12XEQ384 microprocessor with integrated Flash. When the           #
@@ -104,6 +104,9 @@ class DFlashConverter(object):
     
     
     def __init__(self):
+        """ DFlashConverter:
+            This object contains all the magic to convert the D-Flash to Eeprom image.
+        """
         self.block_types = []
         self.block_data = []
         self.endblock = None
@@ -178,24 +181,33 @@ class DFlashConverter(object):
                 if newblock is None:
                     newblock = curr_block
                 elif ended:
-                    logging.error("Found more than one set of new blocks!")
+                    logging.warning("Found more than one set of new blocks!")
                     return None
             elif newblock is not None:
                 ended = True
         # Return the "endblock", which is the block just before the first newblock
+        if newblock is None:
+            logging.warning("No new blocks found!")
+            return None
         return (newblock - 1) % self.NB_BLOCKS
         
     def _find_last_block(self):
+        """ Finds the last block, e.g. the block that is valid but is not
+            (completely) filled with data. Can be used as "endblock" """
         # If there is exactly one "Last" block, simply return it.
         if self.block_types.count(self.LAST) == 1:
             return self.block_types.index(self.LAST)
         if self.block_types.count(self.LAST) == 0:
-            logging.warning("No last block found")
+            logging.warning("No last block found!")
             return None
-        logging.error("More than one 'last' block found!")
+        logging.warning("More than one 'last' block found!")
         return None
     
     def _find_longest_empty(self):
+        """ Finds the longest chain of empty block and returns the 
+            block just before that as lastblock, as a fallback mechanism.
+            Returns the last block of the chain in case no empty block could
+            be found. """
         # It's still possible that there are "NEW" blocks that are not consequtive
         # Therefore, just find the longest chain of "NEW" and "EMPTY" blocks.
         now = 0
@@ -212,9 +224,15 @@ class DFlashConverter(object):
             if now > longest:
                 longest = now
                 longest_block = blockid
-        return (longest_block - longest) % 128
+        if longest_block is None:
+            return self.NB_BLOCKS - 1
+        return (longest_block - longest) % self.NB_BLOCKS
         
     def _save_file(self, filename):
+        """ Given that all the block data and endblock are known, start
+            building the eeprom image and save it to a file and to a
+            local array for analysis 
+        """
         startblock = self.endblock + 1
 
         data = [0xFFFF] * self.EESIZE
@@ -226,35 +244,70 @@ class DFlashConverter(object):
         with open(filename, 'wb') as outfile:
             for word in data:
                 outfile.write(struct.pack(">H", word))
+                
+        self.data = data
 
+    def _get_byte(self, addr):
+        """ Get a single byte from the 16-bit eeprom data array, 
+            after it has been created by _save_file
+        """
+        if addr % 2 == 1:
+            return self.data[addr//2] & 0xFF
+        return self.data[addr//2] >> 8
+
+    def _show_info(self):
+        """ Show info about the re-build image. Currently it shows the
+            VIN number and verifies that it corresponds with the short
+            VIN number
+        """
+        vin = ""
+        for addr in xrange(0xFD3, 0xFE4):
+            vin = vin + chr(self._get_byte(addr))
+        
+        shortvin = ""
+        for addr in xrange(0xF7F, 0xF86):
+            shortvin = shortvin + chr(self._get_byte(addr))
+    
+        if not vin.endswith(shortvin):
+            logging.warning("File seems to be corrupt, short VIN not equal to last part of long VIN")
+        logging.info("Short VIN: %s" % shortvin)
+        logging.info("Long VIN: %s" % vin)
     
     def convert(self, dflash_filename, ee_filename):
+        """ Main function that converts dflash_filename to ee_filename
+            and shows some info afterwards
+        """
         self._read_file(dflash_filename)
         endblock_new = self._find_new_blocks()
         endblock_last = self._find_last_block()
         
         if endblock_new is None:
             if endblock_last is None:
+                logging.warning("No last or new blocks, using longest chain of empty blocks!")
                 self.endblock = self._find_longest_empty()
             else:
                 self.endblock = endblock_last
         else:
-            if endblock_last != endblock_new:
+            if endblock_last != endblock_new and endblock_last is not None:
                 logging.warning("Inconsistency detected, last used block not followed by new blocks!")
                 logging.warning("Using new blocks as reference!")
             self.endblock = endblock_new
         
         self._save_file(ee_filename)
+        
+        self._show_info()
 
 def main():
+    """ No options, just call with dflash_filename and ee_filename..."""
+    
+    logging.getLogger().setLevel(logging.INFO)
+    
     if len(sys.argv) != 3:
         print "Usage: %s <dflash> <eeprom>" % sys.argv[0]
         sys.exit(1)
     
     converter = DFlashConverter()
     converter.convert(sys.argv[1], sys.argv[2])
-    
-
         
 if __name__ == "__main__":
     main()
