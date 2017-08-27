@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <title>FRM3 D-Flash to EEPROM converter</title>
+  <meta name="description" content="A tool to fix your FRM" />
+  <meta name="keywords" content="bmw mini frm frm3 footwell repair d-flash eeprom MC9S12XEQ384 MC9S12XEQ512" />
+  <meta http-equiv="content-type" content="text/html; charset=windows-1252" />
+</head>
+
+<body>
+  <div id="main">
+    <h1>FRM3 D-Flash to EEPROM converter</h1>
+    <p>Here you can simply upload your D-Flash image to have it converted to an Eeprom image for the FRM3. <br />
+       If you have no idea why you would need this, you don't need this.</p>
+    <p>This website stores all uploaded files for analysis. Note that the dump will contain the VIN number
+       of your car, as well as mileage information and other data. The file is only saved with the intention
+       to improve the conversion tool.</p>
+    <form action="convert.php" method="post" enctype="multipart/form-data">
+      Select the D-flash file to upload:
+      <input type="file" name="dflashimage" id="dflashimage" /><br />
+      <label><input type="checkbox" name="storeagreed" value="yes" /> I accept that the D-flash image is stored on the server</label><br />
+      <input type="submit" name="submit" value="Upload">
+    </form>
+    
+    <p><a href="https://github.com/tomvleeuwen/dflash_to_eeprom">Source code</a></p>
+  </div>
+</body>
