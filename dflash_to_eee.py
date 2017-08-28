@@ -91,7 +91,6 @@ class DFlashConverter(object):
     BLOCK_VALID = 0xFACF
     BLOCK_EMPTY = 0xFFFF
     BLOCK_EMPTY_CLEARED = 0xFFFF
-    BLOCK_EMPTY_NEW     = 0xFFFE
     CMD_MASK   = 0xF800
     CMD_VALID  = 0xB800
     CMD_EMPTY  = 0xF800
@@ -127,12 +126,8 @@ class DFlashConverter(object):
                 if header[0] == self.BLOCK_EMPTY:
                     if header[1] == self.BLOCK_EMPTY_CLEARED:
                         self.block_types.append(self.EMPTY)
-                    elif header[1] == 0xFFFE:
+                    else: # Block has already been prepared.
                         self.block_types.append(self.NEW)
-                    else:
-                        logging.warning("Invalid block: %d, type: 0x%04X" % (blockid, header[1]))
-                        # Continue using an empty block type.
-                        self.block_types.append(self.EMPTY)
                 elif header[0] == self.BLOCK_VALID:
                     # There seem to be different type of data blocks defined in header[1],
                     # however I have currently no idea how to handle it.
@@ -289,8 +284,14 @@ class DFlashConverter(object):
                 self.endblock = endblock_last
         else:
             if endblock_last != endblock_new and endblock_last is not None:
-                logging.warning("Inconsistency detected, last used block not followed by new blocks!")
-                logging.warning("Using new blocks as reference!")
+                # It is allowed to have empty blocks between the last used and the new block.
+                block_types = self.block_types + self.block_types
+                if endblock_new < endblock_last:
+                    endblock_new += 128
+                if block_types[endblock_last+1:endblock_new+1].count(self.EMPTY) != \
+                                                    endblock_new - endblock_last:
+                    logging.warning("Inconsistency detected, last used block not followed by new blocks!")
+                    logging.warning("Using new blocks as reference!")
             self.endblock = endblock_new
         
         self._save_file(ee_filename)
