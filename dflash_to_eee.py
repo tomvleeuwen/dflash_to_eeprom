@@ -251,22 +251,13 @@ class DFlashConverter(object):
         return self.data[addr//2] >> 8
 
     def _show_info(self):
-        """ Show info about the re-build image. Currently it shows the
-            VIN number and verifies that it corresponds with the short
+        """ Show info about the re-build image. Currently it only shows the
             VIN number
         """
         vin = ""
         for addr in xrange(0xFD3, 0xFE4):
             vin = vin + chr(self._get_byte(addr))
-        
-        shortvin = ""
-        for addr in xrange(0xF7F, 0xF86):
-            shortvin = shortvin + chr(self._get_byte(addr))
-    
-        if not vin.endswith(shortvin):
-            logging.warning("File seems to be corrupt, short VIN not equal to last part of long VIN")
-        logging.info("Short VIN: %s" % shortvin)
-        logging.info("Long VIN: %s" % vin)
+        logging.info("VIN: %s" % vin)
     
     def convert(self, dflash_filename, ee_filename):
         """ Main function that converts dflash_filename to ee_filename
@@ -287,7 +278,7 @@ class DFlashConverter(object):
                 # It is allowed to have empty blocks between the last used and the new block.
                 block_types = self.block_types + self.block_types
                 if endblock_new < endblock_last:
-                    endblock_new += 128
+                    endblock_new += len(self.block_types)
                 if block_types[endblock_last+1:endblock_new+1].count(self.EMPTY) != \
                                                     endblock_new - endblock_last:
                     logging.warning("Inconsistency detected, last used block not followed by new blocks!")
