@@ -162,7 +162,7 @@ class DFlashConverter(object):
         # we can easily loop through it without accounting for the
         # start - end split
         curr_block = 0
-        while block_types[curr_block] == self.NEW:
+        while block_types[curr_block] == self.NEW or block_types[curr_block] == self.EMPTY:
             block_types.append(block_types[curr_block])
             curr_block += 1
             if curr_block > self.NB_BLOCKS:
@@ -178,7 +178,7 @@ class DFlashConverter(object):
                 elif ended:
                     logging.warning("Found more than one set of new blocks!")
                     return None
-            elif newblock is not None:
+            elif block_types[curr_block] != self.EMPTY and newblock is not None:
                 ended = True
         # Return the "endblock", which is the block just before the first newblock
         if newblock is None:
