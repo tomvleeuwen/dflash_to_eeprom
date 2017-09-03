@@ -1,0 +1,2 @@
+install: true
+script: ci/run_ci.sh
