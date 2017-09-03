@@ -1,4 +1,4 @@
-# dflash_to_eeprom
+# dflash_to_eeprom [![Build Status](https://travis-ci.org/tomvleeuwen/dflash_to_eeprom.svg?branch=master)](https://travis-ci.org/tomvleeuwen/dflash_to_eeprom)
 Tool to fix corrupt MC9S12XEQ384 eeprom.
 
 # Background
