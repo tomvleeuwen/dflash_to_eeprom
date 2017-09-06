@@ -1,2 +1,2 @@
 Traceback (most recent call last):
-struct.error: unpack requires a string argument of length 4
+Exception: Input file too short

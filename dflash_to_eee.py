@@ -122,6 +122,8 @@ class DFlashConverter(object):
                 
                 infile.seek(blockid * self.BLOCKSIZE)
                 blockheader = infile.read(self.HEADERSIZE)
+                if len(blockheader) != 4:
+                    raise Exception("Input file too short")
                 header = struct.unpack(">HH", blockheader)
                 if header[0] == self.BLOCK_EMPTY:
                     if header[1] == self.BLOCK_EMPTY_CLEARED:
@@ -135,6 +137,8 @@ class DFlashConverter(object):
                     self.block_types.append(self.VALID)
                     for blockitem in xrange(self.cmds_per_block):
                         cmdread = infile.read(self.CMDSIZE)
+                        if len(cmdread) != 4:
+                            raise Exception("Input file too short")
                         datapair = struct.unpack(">HH", cmdread)
                         
                         cmd  = datapair[0] & self.CMD_MASK
