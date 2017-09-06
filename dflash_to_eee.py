@@ -250,20 +250,25 @@ class DFlashConverter(object):
             return self.data[addr//2] & 0xFF
         return self.data[addr//2] >> 8
 
-    def _show_info(self):
+    def _get_info(self):
         """ Show info about the re-build image. Currently it only shows the
             VIN number
         """
         vin = ""
         for addr in xrange(0xFD3, 0xFE4):
             vin = vin + chr(self._get_byte(addr))
-        logging.info("VIN: %s" % vin)
+        return "VIN: %s" % vin
     
     def convert(self, dflash_filename, ee_filename):
         """ Main function that converts dflash_filename to ee_filename
             and shows some info afterwards
         """
         self._read_file(dflash_filename)
+        self._find_endblock()
+        self._save_file(ee_filename)
+        logging.info(self._get_info())
+    
+    def _find_endblock(self):
         endblock_new = self._find_new_blocks()
         endblock_last = self._find_last_block()
         
@@ -285,9 +290,6 @@ class DFlashConverter(object):
                     logging.warning("Using new blocks as reference!")
             self.endblock = endblock_new
         
-        self._save_file(ee_filename)
-        
-        self._show_info()
 
 def main():
     """ No options, just call with dflash_filename and ee_filename..."""
