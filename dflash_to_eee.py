@@ -261,7 +261,52 @@ class DFlashConverter(object):
         vin = ""
         for addr in xrange(0xFD3, 0xFE4):
             vin = vin + chr(self._get_byte(addr))
-        return "VIN: %s" % vin
+        result += "VIN: %s\n" % vin
+        
+        # Mfg. date
+        day = "%02x" % self._get_byte(0xFBE)
+        month = "%02x" % self._get_byte(0xFBD)
+        year = "%02x" % self._get_byte(0xFBB) + "%02x" % self._get_byte(0xFBC)
+        result += "Production date: %s.%s.%s\n" % (day, month, year)
+        
+        # Original programming date - always equal to production date...
+        # day = "%02x" % self._get_byte(0xFA0)
+        # month = "%02x" % self._get_byte(0xF9F)
+        # year = "%02x" % self._get_byte(0xF9D) + "%02x" % self._get_byte(0xF9E)
+        # result += "MIF. date: %s.%s.%s\n" % (day, month, year)
+        
+        # Prog. date
+        day = "%02x" % self._get_byte(0xF89)
+        month = "%02x" % self._get_byte(0xF88)
+        year = "%02x" % self._get_byte(0xF86) + "%02x" % self._get_byte(0xF87)
+        result += "Programming date: %s.%s.%s\n" % (day, month, year)
+        
+        # Mfg. part no
+        data = 0
+        for byte in xrange(6):
+            data = (data << 8) + self._get_byte(0xF97 + byte)
+        result += "HW-NR: %07x (Hardware part number)\n" % data
+        
+        # MIF part no
+        data = 0
+        for byte in xrange(6):
+            data = (data << 8) + self._get_byte(0xF8A + byte)
+        result += "SW-NR: %07x (Updated part number)\n" % data
+        
+        # MIF part no
+        data = 0
+        for byte in xrange(6):
+            data = (data << 8) + self._get_byte(0xF65 + byte)
+        result += "ZB-NR: %07x (Original part number)\n" % data
+        
+        # Sticker part no?
+        data = 0
+        for byte in xrange(6):
+            data = (data << 8) + self._get_byte(0xFBF + byte)
+        result += "S:     %07x (Original part number)\n" % data
+        
+        return result
+        
     
     def convert(self, dflash_filename, ee_filename):
         """ Main function that converts dflash_filename to ee_filename
