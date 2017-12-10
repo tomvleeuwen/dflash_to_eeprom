@@ -1,0 +1,12 @@
+WARNING:root:Inconsistency detected, last used block not followed by new blocks!
+WARNING:root:Using new blocks as reference!
+INFO:root:
+
+VIN: 7UVG9OJOLY101ZWX0
+Production date: 18.05.2011
+Programming date: ff.ff.ffff
+HW-NR: 3455163 (Hardware part number)
+SW-NR: ffffffffffff (Updated part number)
+ZB-NR: ffffffffffff (Original part number)
+S:     3456588 (Original part number)
+

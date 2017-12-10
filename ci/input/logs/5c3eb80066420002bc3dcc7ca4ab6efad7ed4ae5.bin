@@ -1,6 +1,8 @@
 ERROR:root:Unknown block type: 0x0000
-ERROR:root:Continuing anyway...
 ERROR:root:Unknown block type: 0x0000
-ERROR:root:Continuing anyway...
 Traceback (most recent call last):
+    main()
+    converter.convert(sys.argv[1], sys.argv[2])
+    self._read_file(dflash_filename)
+    raise Exception("Input file too short")
 Exception: Input file too short
