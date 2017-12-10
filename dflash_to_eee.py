@@ -70,7 +70,7 @@
 #                                                                       #
 # This is all just based on looking to a D-flash dump, so there might   #
 # be more magic. However, the resuling eeprom file looks reasonable,    #
-# however I did not yet have the chance to test the results.            #
+# and it worked in all cases where this tool did not report an error.   #
 #                                                                       #
 #########################################################################
 
