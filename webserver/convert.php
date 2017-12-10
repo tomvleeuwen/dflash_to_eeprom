@@ -57,6 +57,8 @@
                     echo($stderr);
                     echo "</pre>";
 
+                    echo "<p>Before downloading, ensure that the VIN is correct.</p>"
+
                     echo "<h2><a href=\"download.php?sha1=" . $sha1 . "\">Download EEPROM image</a></h2>";
                 }
             }
