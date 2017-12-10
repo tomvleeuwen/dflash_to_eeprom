@@ -232,7 +232,7 @@ class DFlashConverter(object):
             building the eeprom image and save it to a file and to a
             local array for analysis 
         """
-        startblock = self.endblock + 1
+        startblock = (self.endblock + 1) % self.NB_BLOCKS
 
         data = [0xFFFF] * self.EESIZE
         for block in range(startblock, self.NB_BLOCKS) + range(0, startblock):
@@ -283,13 +283,16 @@ class DFlashConverter(object):
             else:
                 self.endblock = endblock_last
         else:
+            # This whole if-statement is just here to generate the warning message.
             if endblock_last != endblock_new and endblock_last is not None:
                 # It is allowed to have empty blocks between the last used and the new block.
+                # Make sure we have a contineous set of blocks by appending the list to itself.
                 block_types = self.block_types + self.block_types
-                if endblock_new < endblock_last:
-                    endblock_new += len(self.block_types)
-                if block_types[endblock_last+1:endblock_new+1].count(self.EMPTY) != \
-                                                    endblock_new - endblock_last:
+                endblock_new_wrapped = endblock_new
+                if endblock_new_wrapped < endblock_last:
+                    endblock_new_wrapped += len(self.block_types)
+                if block_types[endblock_last+1:endblock_new_wrapped+1].count(self.EMPTY) != \
+                                                    endblock_new_wrapped - endblock_last:
                     logging.warning("Inconsistency detected, last used block not followed by new blocks!")
                     logging.warning("Using new blocks as reference!")
             self.endblock = endblock_new
