@@ -1,3 +1,12 @@
 WARNING:root:Inconsistency detected, last used block not followed by new blocks!
 WARNING:root:Using new blocks as reference!
-INFO:root:VIN: CLW4FDL90L9JMAQM4
+INFO:root:
+
+VIN: CLW4FDL90L9JMAQM4
+Production date: 27.09.2011
+Programming date: 06.11.2014
+HW-NR: 9206234 (Hardware part number)
+SW-NR: 9308375 (Updated part number)
+ZB-NR: 9287252 (Original part number)
+S:     9263792 (Original part number)
+
