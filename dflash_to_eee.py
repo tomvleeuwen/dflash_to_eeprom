@@ -109,6 +109,7 @@ class DFlashConverter(object):
         self.block_types = []
         self.block_data = []
         self.endblock = None
+        self.corrupt = None
         
         self.cmds_per_block = (self.BLOCKSIZE - self.HEADERSIZE) / self.CMDSIZE
         
@@ -116,6 +117,7 @@ class DFlashConverter(object):
         """ Reads the d-flash file and stores the data in convenient lists
             of block types and block commands
         """
+        self.corrupt = False
         with open(filename, 'rb') as infile:
             self.block_data = [ [] for _ in xrange(self.NB_BLOCKS)]
             for blockid in xrange(self.NB_BLOCKS):
@@ -151,9 +153,10 @@ class DFlashConverter(object):
                             self.block_types[-1] = self.LAST
                         else:
                             logging.error("Unknown CMD type detected: 0x%02X" % cmd)
+                            self.corrupt = True
                 else:
                     logging.error("Unknown block type: 0x%04X" % header[0])
-                    logging.error("Continuing anyway...")
+                    self.corrupt = True
                     self.block_types.append(self.INVALID)
     
     def _find_new_blocks(self):
@@ -258,6 +261,12 @@ class DFlashConverter(object):
         """ Show info about the re-build image. Currently it only shows the
             VIN number
         """
+        result = "\n\n"
+        
+        if self.corrupt:
+            result += "Corrupt D-Flash file detected! Results probably incorrect!\n"
+        
+        # VIN
         vin = ""
         for addr in xrange(0xFD3, 0xFE4):
             vin = vin + chr(self._get_byte(addr))
