@@ -29,6 +29,7 @@
                 /* The checks we can do in PHP seems to be passed. Save the file under its sha1sum and then execute the python script */
                 $sha1 = sha1_file($_FILES["dflashimage"]["tmp_name"]);
                 $target = $target_path . "/" . $sha1 . ".bin";
+                $logfile = $logfile_path . "/" . $sha1 . ".txt";
                 if (!move_uploaded_file($_FILES["dflashimage"]["tmp_name"], $target)) {
                     echo "<p>Error moving file to target. Please contact the administrator</p>";
                 }
@@ -49,6 +50,11 @@
                     $stderr = stream_get_contents($pipes[2]);
                     fclose($pipes[2]);
 
+                    $logfp = fopen($logfile, "w");
+                    fwrite($logfp, $stdout);
+                    fwrite($logfp, $stderr);
+                    fclose($logfp);
+
                     echo "<h1>Conversion complete.</h1>";
                     
                     echo "<h3>Logfile: </h3>";
@@ -57,14 +63,18 @@
                     echo($stderr);
                     echo "</pre>";
 
-                    echo "<p>Before downloading, ensure that the VIN is correct.</p>"
+                    echo "<p>Before downloading, ensure that the VIN is correct.</p>";
 
                     echo "<h2><a href=\"download.php?sha1=" . $sha1 . "\">Download EEPROM image</a></h2>";
+
+                    echo "<h2><strong>Note:</strong> Ensure you write to EEE partition and not back to D-Flash!</h2>";
+                    echo "<h2><strong>Note:</strong> Always verify after writing the image to the device!</h2>";
                 }
             }
         }
     }
 ?>
     <p><a href="https://github.com/tomvleeuwen/dflash_to_eeprom">Source code</a></p>
+    <p><a href="https://github.com/tomvleeuwen/dflash_to_eeprom/releases/tag/1.1">Offline version</a></p>
   </div>
 </body>

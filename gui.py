@@ -36,6 +36,11 @@ import sys
 from dflash_to_eee import DFlashConverter
 import Tkinter, tkFileDialog, tkMessageBox
 
+USER_NOTES = """
+NOTE: Ensure you write to EEE partition and not back to D-Flash!
+
+NOTE: Always verify after writing the image to the device!"""
+
 
 def main():
     converter = DFlashConverter()
@@ -64,6 +69,8 @@ def main():
         return -1
 
     tkMessageBox.showinfo(title="Conversion complete", message=converter._get_info())
+
+    tkMessageBox.showwarning(title="Warning", message=USER_NOTES)
 
 if __name__ == "__main__":
     sys.exit(main())
