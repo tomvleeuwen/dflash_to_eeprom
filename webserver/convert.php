@@ -74,7 +74,7 @@
         }
     }
 ?>
-    <p><a href="https://github.com/tomvleeuwen/dflash_to_eeprom">Source code</a></p>
-    <p><a href="https://github.com/tomvleeuwen/dflash_to_eeprom/releases/tag/1.1">Offline version</a></p>
+    <p><a href="https://gitlab.com/tomvleeuwen/dflash_to_eeprom">Source code</a></p>
+    <p><a href="https://gitlab.com/tomvleeuwen/dflash_to_eeprom/tags/1.1">Offline version</a></p>
   </div>
 </body>
