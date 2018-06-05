@@ -1,0 +1,14 @@
+# default image is debian 8
+
+regressiontests:
+  stage: test
+  before_script:
+    - apt-get update -qy
+    - apt-get install -y python-minimal
+  script:
+    - ./ci/run_ci.sh
+  artifacts:
+    when: always
+    paths:
+      - ci/results/*
+
