@@ -3,6 +3,7 @@ Tool to fix corrupt MC9S12XEQ384 eeprom.
 
 # Background
 The "FRM3" and other Electronic Control Units contain the MC9S12XEQ384 microprocessor with integrated Flash. When the integrated Flash is used in eeprom emulation mode, like in the case of the FRM3, the settings can get corrupted making the ECU unable to  access the eeprom again. The ECU can be repaired by programming the correct data in the (simulated) eeprom.
+There are multiple errata specified for the MC9S12XEQ384 that can cause Emulated EEPROM corruption, but I suspect that this one is the curlpit in the case of the FRM: https://www.nxp.com/docs/en/errata/MSE9S12XEQ512_1M25J.htm#xxMUCts03822 
 
 # Usage
 This tool allows the corrupt data in the microprocessor to be read, even after the eeprom got corrupted. This is done by reading the d-flash contents from the microcontroller using an appropriate programmer (like xprog), after which this program can convert it to an eeprom image which can then be programmed to the simulated eeprom area again using the same programmer.
