@@ -254,8 +254,8 @@ class DFlashConverter(object):
             after it has been created by _save_file
         """
         if addr % 2 == 1:
-            return self.data[addr//2] & 0xFF
-        return self.data[addr//2] >> 8
+            return bytes([self.data[addr//2] & 0xFF])
+        return bytes([self.data[addr//2] >> 8])
 
     def _get_info(self):
         """ Show info about the re-build image. Currently it only shows the
@@ -267,15 +267,15 @@ class DFlashConverter(object):
             result += "Corrupt D-Flash file detected! Results probably incorrect!\n"
         
         # VIN
-        vin = ""
+        vin = b""
         for addr in range(0xFD3, 0xFE4):
-            vin = vin + chr(self._get_byte(addr))
-        result += "VIN: %s\n" % vin
+            vin = vin + self._get_byte(addr)
+        result += "VIN: %s\n" % vin.decode("latin-1")
         
         # Mfg. date
-        day = "%02x" % self._get_byte(0xFBE)
-        month = "%02x" % self._get_byte(0xFBD)
-        year = "%02x" % self._get_byte(0xFBB) + "%02x" % self._get_byte(0xFBC)
+        day = "%02x" % ord(self._get_byte(0xFBE))
+        month = "%02x" % ord(self._get_byte(0xFBD))
+        year = "%02x" % ord(self._get_byte(0xFBB)) + "%02x" % ord(self._get_byte(0xFBC))
         result += "Production date: %s.%s.%s\n" % (day, month, year)
         
         # Original programming date - always equal to production date...
@@ -285,34 +285,34 @@ class DFlashConverter(object):
         # result += "MIF. date: %s.%s.%s\n" % (day, month, year)
         
         # Prog. date
-        day = "%02x" % self._get_byte(0xF89)
-        month = "%02x" % self._get_byte(0xF88)
-        year = "%02x" % self._get_byte(0xF86) + "%02x" % self._get_byte(0xF87)
+        day = "%02x" % ord(self._get_byte(0xF89))
+        month = "%02x" % ord(self._get_byte(0xF88))
+        year = "%02x" % ord(self._get_byte(0xF86)) + "%02x" % ord(self._get_byte(0xF87))
         result += "Programming date: %s.%s.%s\n" % (day, month, year)
         
         # Mfg. part no
-        data = 0
+        data = b""
         for byte in range(6):
-            data = (data << 8) + self._get_byte(0xF97 + byte)
-        result += "HW-NR: %07x (Hardware part number)\n" % data
+            data += self._get_byte(0xF97 + byte)
+        result += "HW-NR: %07x (Hardware part number)\n" % int.from_bytes(data, byteorder="big")
         
         # MIF part no
-        data = 0
+        data = b""
         for byte in range(6):
-            data = (data << 8) + self._get_byte(0xF8A + byte)
-        result += "SW-NR: %07x (Updated part number)\n" % data
+            data += self._get_byte(0xF8A + byte)
+        result += "SW-NR: %07x (Updated part number)\n" % int.from_bytes(data, byteorder="big")
         
         # MIF part no
-        data = 0
+        data = b""
         for byte in range(6):
-            data = (data << 8) + self._get_byte(0xF65 + byte)
-        result += "ZB-NR: %07x (Original part number)\n" % data
+            data += self._get_byte(0xF65 + byte)
+        result += "ZB-NR: %07x (Original part number)\n" % int.from_bytes(data, byteorder="big")
         
         # Sticker part no?
-        data = 0
+        data = b""
         for byte in range(6):
-            data = (data << 8) + self._get_byte(0xFBF + byte)
-        result += "S:     %07x (Original part number)\n" % data
+            data += self._get_byte(0xFBF + byte)
+        result += "S:     %07x (Original part number)\n" % int.from_bytes(data, byteorder="big")
         
         return result
         
