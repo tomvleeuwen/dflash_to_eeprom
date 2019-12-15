@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright 2017, Ben van Leeuwen Autotechniek, https://www.benvanleeuwen.com/
@@ -111,7 +111,7 @@ class DFlashConverter(object):
         self.endblock = None
         self.corrupt = None
         
-        self.cmds_per_block = (self.BLOCKSIZE - self.HEADERSIZE) / self.CMDSIZE
+        self.cmds_per_block = (self.BLOCKSIZE - self.HEADERSIZE) // self.CMDSIZE
         
     def _read_file(self, filename):
         """ Reads the d-flash file and stores the data in convenient lists
