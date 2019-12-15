@@ -119,8 +119,8 @@ class DFlashConverter(object):
         """
         self.corrupt = False
         with open(filename, 'rb') as infile:
-            self.block_data = [ [] for _ in xrange(self.NB_BLOCKS)]
-            for blockid in xrange(self.NB_BLOCKS):
+            self.block_data = [ [] for _ in range(self.NB_BLOCKS)]
+            for blockid in range(self.NB_BLOCKS):
                 
                 infile.seek(blockid * self.BLOCKSIZE)
                 blockheader = infile.read(self.HEADERSIZE)
@@ -137,7 +137,7 @@ class DFlashConverter(object):
                     # however I have currently no idea how to handle it.
                     logging.debug("Data block id: %d, type: 0x%04X" % (blockid, header[1]))
                     self.block_types.append(self.VALID)
-                    for blockitem in xrange(self.cmds_per_block):
+                    for blockitem in range(self.cmds_per_block):
                         cmdread = infile.read(self.CMDSIZE)
                         if len(cmdread) != 4:
                             raise Exception("Input file too short")
@@ -178,7 +178,7 @@ class DFlashConverter(object):
         newblock = None
         ended = False
         
-        for curr_block in xrange(curr_block, len(block_types)):
+        for curr_block in range(curr_block, len(block_types)):
             if block_types[curr_block] == self.NEW:
                 if newblock is None:
                     newblock = curr_block
@@ -238,7 +238,7 @@ class DFlashConverter(object):
         startblock = (self.endblock + 1) % self.NB_BLOCKS
 
         data = [0xFFFF] * self.EESIZE
-        for block in range(startblock, self.NB_BLOCKS) + range(0, startblock):
+        for block in list(range(startblock, self.NB_BLOCKS)) + list(range(0, startblock)):
             for item in self.block_data[block]:
                 data[item[0]] = item[1]
 
@@ -268,7 +268,7 @@ class DFlashConverter(object):
         
         # VIN
         vin = ""
-        for addr in xrange(0xFD3, 0xFE4):
+        for addr in range(0xFD3, 0xFE4):
             vin = vin + chr(self._get_byte(addr))
         result += "VIN: %s\n" % vin
         
@@ -292,25 +292,25 @@ class DFlashConverter(object):
         
         # Mfg. part no
         data = 0
-        for byte in xrange(6):
+        for byte in range(6):
             data = (data << 8) + self._get_byte(0xF97 + byte)
         result += "HW-NR: %07x (Hardware part number)\n" % data
         
         # MIF part no
         data = 0
-        for byte in xrange(6):
+        for byte in range(6):
             data = (data << 8) + self._get_byte(0xF8A + byte)
         result += "SW-NR: %07x (Updated part number)\n" % data
         
         # MIF part no
         data = 0
-        for byte in xrange(6):
+        for byte in range(6):
             data = (data << 8) + self._get_byte(0xF65 + byte)
         result += "ZB-NR: %07x (Original part number)\n" % data
         
         # Sticker part no?
         data = 0
-        for byte in xrange(6):
+        for byte in range(6):
             data = (data << 8) + self._get_byte(0xFBF + byte)
         result += "S:     %07x (Original part number)\n" % data
         
@@ -358,7 +358,7 @@ def main():
     logging.getLogger().setLevel(logging.INFO)
     
     if len(sys.argv) != 3:
-        print "Usage: %s <dflash> <eeprom>" % sys.argv[0]
+        print("Usage: %s <dflash> <eeprom>" % sys.argv[0])
         sys.exit(1)
     
     converter = DFlashConverter()
